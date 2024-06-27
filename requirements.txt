@@ -8,3 +8,6 @@ streamlit==1.23.0
 scikit-learn
 PyPDF2~=2.0
 streamlit-pdf-viewer
+pyautogui 
+pygetwindow 
+opencv-python
