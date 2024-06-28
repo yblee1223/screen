@@ -3,8 +3,9 @@
 # exe 실행파일 만들기
 1. .venv 가상환경 만들기
 ```
-python -m venv .venv // 가상환경 생성
-.\.venv\Scripts\activate // 가상환경 실행
+python3 -m venv .venv // 가상환경 생성
+.\.venv\Scripts\activate // 가상환경 실행 window
+# source .venv/bin/activate // mac & linux
 pip install -r requirements.txt // 라이브러리 설치
 ```
 

@@ -8,7 +8,7 @@ footer {
 	
 	}
 footer:after {
-	content:'(주)왓츠랩 제작'; 
+	content:'(주)왓츠랩 제작 | Version 0.7 beta'; 
 	visibility: visible;
 	display: block;
 	position: relative;

@@ -33,10 +33,6 @@ def screen_capture(title_name):
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
     out = cv2.VideoWriter(f"{title_name}.mp4", fourcc, 20.0, (width, height))
 
-    return out
-
-def capturing():
-
     while True:
         # 창 영역 캡처
         img = pyautogui.screenshot(region=(left, top, width, height))
@@ -59,5 +55,7 @@ def capturing():
     cv2.destroyAllWindows()
 
 
+
 if __name__ == "__main__":
     print(lastest_file())
+    threading.Thread(target=screen_capture, args=[lastest_file()]).start()
