@@ -54,20 +54,20 @@ def side_bar():
         if user_name:
             if startTest_button: 
                 print("----------------------- start")
+                timestr = time.strftime("%Y%m%d%H%M%S")
+                st.session_state.timestr = timestr
                 st.session_state.on_test = False
                 st.session_state.user_name = user_name
                 st.session_state.content = content
                 st.session_state.level = level
 
-                message = startTest(user_name, content, level)
+                message = startTest(st.session_state.user_name, st.session_state.content, st.session_state.level, st.session_state.timestr)
                 if message: st.error(message)
                 else: st.success("검사가 시작되었습니다.")
 
             stopTest_button = st.button('검사 종료')
             if stopTest_button:
                 print("----------------------- stop")
-                timestr = time.strftime("%Y%m%d%H%M%S")
-                st.session_state.timestr = timestr
                 message = stopTest(st.session_state.user_name, st.session_state.content, st.session_state.level, st.session_state.timestr)
                 if message: st.error(message)
                 else: st.success("검사가 종료되었습니다.")

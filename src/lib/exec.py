@@ -5,8 +5,17 @@ import subprocess
 import json
 import pandas as pd
 import time
+import sys
 
-def startTest(user_name, content, level):
+
+sys.path.append(os.path.join('.', 'src', 'lib'))
+
+from lib.file import *
+
+recorder = None
+
+def startTest(user_name, content, level, timestr):
+    global recorder
     print(f"{user_name}의 테스트를 시작합니다")
     print(f"콘텐츠: {content}")
     print(f"난이도: level{level}")
@@ -18,22 +27,31 @@ def startTest(user_name, content, level):
         print("ACTION: Remove dummy file ")
 
     unity_content = f"{content}_Level{level}.exe" # unity content file name
+    file_name = f"{user_name}_{content}_{level}_{timestr}"
     dummy_path = os.path.join(".", "data", "dummy", "tmp")
-    unity_path = os.path.join(".", "data", "unity", f"{content}", f"{content}_Level{level}")
+    unity_path = os.path.join(".", "data", "unity", content, f"{content}_Level{level}")
     
     # unity file copy
     shutil.copytree(unity_path, dummy_path) 
+
     try:
         # unity file execute
         subprocess.Popen([os.path.join(dummy_path, unity_content)])
-        # time.sleep(20)
     except:
-        error_text = "ERROR: Can't execute unity content"
+        error_text = "ERROR: 콘텐츠를 재생할 수 없습니다"
         print(error_text)
         return error_text
-    return False
+    
+    try:
+        recorder = ScreenRecorder()
+        recorder.start_recording(file_name)
+    except:
+        error_text = "ERROR: 영상을 녹화할 수 없습니다."
+        print(error_text)
+        return error_text
 
 def stopTest(user_name, content, level, timestr):
+    global recorder
     file_name = f"{user_name}_{content}_{level}_{timestr}"
     input_path = os.path.join(".", "data", "input")
     dummy_path = os.path.join(".", "data", "dummy", "tmp")
@@ -44,6 +62,13 @@ def stopTest(user_name, content, level, timestr):
         os.system(f"taskkill /im {unity_content}")
     except:
         error_text = "ERROR: 프로그램을 종료할 수 없습니다."
+        print(error_text)
+        return error_text
+    
+    try:
+       recorder.stop_recording()
+    except:
+        error_text = "ERROR: 영상을 저장할 수 없습니다."
         print(error_text)
         return error_text
 
@@ -80,6 +105,6 @@ if __name__ == "__main__":
     level = 1
     timestr = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
 
-    startTest(user_name, content, level)
+    startTest(user_name, content, level, timestr)
     time.sleep(20)
     stopTest(user_name, content, level, timestr)

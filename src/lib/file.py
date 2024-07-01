@@ -18,44 +18,52 @@ def lastest_file():
     for file_name in dir:
         if lastest_timestr in file_name:
             return file_name
-
-def screen_capture(title_name):
-    all_title = gw.getAllTitles()
-    title = [file for file in all_title if ("Level" in file)]
-
-    if not title:
-        print("No window with 'Level' in the title found!")
-        exit()
-
-    window = gw.getWindowsWithTitle(title[0])[0]
-    left, top, width, height = window.left, window.top, window.width, window.height
-
-    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    out = cv2.VideoWriter(f"{title_name}.mp4", fourcc, 20.0, (width, height))
-
-    while True:
-        # 창 영역 캡처
-        img = pyautogui.screenshot(region=(left, top, width, height))
-        frame = np.array(img)
-        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         
-        # 캡처한 프레임을 파일에 작성
-        out.write(frame)
-        
-        # ESC 키를 누르면 레코딩 종료
-        if cv2.waitKey(1) == 27:
-            break
-        
-        # 설정된 시간 동안 녹화 후 종료
-        if time.time() - start_time > record_seconds:
-            break
+class ScreenRecorder:
+    def __init__(self) -> None:
+        self.__running = False
+        self.video_folder = os.path.join('data', 'video')
+        if not os.path.exists(self.video_folder):
+            os.mkdir(self.video_folder)
+    
+    def _start_recording(self, video_name:str) -> None:
+        time.sleep(10)
+        self.__running = True
+        all_title = gw.getAllTitles()
+        title = [file for file in all_title if ("Level" in file)]
 
-    # 리소스 해제
-    out.release()
-    cv2.destroyAllWindows()
+        if not title:
+            print("ERROR: No window with 'Level' in the title found!")
+            return None
+        window = gw.getWindowsWithTitle(title[0])[0]
+        left, top, width, height = window.left, window.top, window.width, window.height
+
+        fourcc = cv2.VideoWriter_fourcc(*'X264')
+        out = cv2.VideoWriter(os.path.join(self.video_folder, f"{video_name}.mp4"), fourcc, 30.0, (width, height))
+
+        while self.__running:
+            img = pyautogui.screenshot(region=(left, top, width, height))
+            frame = cv2.cvtColor(np.array(img), cv2.COLOR_BGR2RGB)
+            out.write(frame)
+
+            if cv2.waitKey(1) == 27:
+                break
+        
+        out.release()
+    
+    def start_recording(self, video_name:str) -> None:
+        t = threading.Thread(target=self._start_recording, args=(video_name,))
+        t.start()
+
+    def stop_recording(self) -> None:
+        self.__running = False
+        cv2.destroyAllWindows()
 
 
 
 if __name__ == "__main__":
     print(lastest_file())
-    threading.Thread(target=screen_capture, args=[lastest_file()]).start()
+    recorder = ScreenRecorder()
+    threading.Thread(target=recorder.start_recording, args=["hello",]).start()
+    time.sleep(10)
+    threading.Thread(target=recorder.stop_recording, args=[]).start()

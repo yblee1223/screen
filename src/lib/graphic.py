@@ -50,6 +50,12 @@ def report(file_name):
     st.markdown(print_profile(file_name, score, time_spent, fps))
     st.markdown('')
 
+    st.caption('운동 영상')
+    file_path = file_name.split('.')[0]
+    video_file = open(os.path.join('data', 'video', f'{file_path}.mp4'), 'rb')
+    video_bytes = video_file.read()
+    st.video(video_bytes)
+
     st.caption('환자 HMD 데이터 분석 그래프 Rotation')
     st.plotly_chart(rotation_graph(df))
 
